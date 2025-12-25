@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CleanFest AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
+
+body{
+  color:white;
+  background:
+    linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.85)),
+    url("Playful Cleanliness in Digital Gaming Poster.png");
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
+}
+
+/* LOGIN */
+.login{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.login-box{
+  background:rgba(0,0,0,.75);
+  padding:40px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 0 35px rgba(0,255,255,.5);
+}
+
+.login-box h1{
+  font-size:3rem;
+  color:#6ef3ff;
+  text-shadow:0 0 20px #6ef3ff;
+}
+
+.login-box input{
+  width:100%;
+  padding:12px;
+  margin-top:20px;
+  border-radius:10px;
+  border:none;
+}
+
+.login-box button{
+  margin-top:20px;
+  padding:12px 30px;
+  border:none;
+  border-radius:25px;
+  background:#6ef3ff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* HERO */
+.hero{
+  height:100vh;
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
+
+.hero h1{
+  font-size:5.5rem;
+  color:#6ef3ff;
+  text-shadow:0 0 20px #6ef3ff,0 0 60px #00cfff;
+}
+
+.hero h2{
+  margin-top:15px;
+  font-size:2rem;
+  color:#b6f7ff;
+}
+
+.hero p{
+  margin-top:20px;
+  max-width:700px;
+  font-size:1.2rem;
+}
+
+.hero button{
+  margin-top:35px;
+  padding:15px 45px;
+  border:none;
+  border-radius:30px;
+  background:#6ef3ff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* SECTIONS */
+.section{
+  padding:80px 40px;
+  display:none;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:40px;
+  max-width:1300px;
+  margin:auto;
+}
+
+.card{
+  background:rgba(0,0,0,.6);
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 0 25px rgba(0,255,255,.25);
+}
+
+h3{
+  color:#6ef3ff;
+  margin-bottom:15px;
+}
+
+/* GAME */
+.game-box{
+  height:300px;
+  background:black;
+  border-radius:15px;
+  position:relative;
+}
+
+.score{
+  position:absolute;
+  top:10px;
+  left:10px;
+}
+
+/* MEDIA */
+video, img{
+  width:100%;
+  border-radius:15px;
+  margin-top:10px;
+  border:3px solid #6ef3ff;
+}
+
+input, textarea{
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  margin-top:10px;
+}
+
+button{
+  margin-top:15px;
+  padding:10px 25px;
+  border:none;
+  border-radius:20px;
+  background:#6ef3ff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+ul{
+  list-style:none;
+}
+
+.social-buttons{
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-top:15px;
+}
+
+footer{
+  background:black;
+  padding:20px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<section class="login" id="login">
+  <div class="login-box">
+    <h1>CleanFest AI</h1>
+    <p>Enter your name to continue</p>
+    <input id="username" placeholder="Your Name">
+    <button onclick="login()">Login</button>
+  </div>
+</section>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <h1>CLEAN FEST AI</h1>
+  <h2>CLEAN PLAY WIN!</h2>
+  <h3>Turn tidying up into your next high score</h3>
+  <p>AI-powered gamified cleanliness for concerts and events</p>
+  <button onclick="document.getElementById('main').scrollIntoView({behavior:'smooth'})">
+    Start Playing
+  </button>
+</section>
+
+<!-- MAIN CONTENT -->
+<section id="main" class="section">
+<div class="grid">
+
+  <div class="card">
+    <h3>🌱 Concept</h3>
+    <p>Gamified cleanliness verified by AI with real rewards.</p>
+  </div>
+
+  <div class="card">
+    <h3>🎮 Cleanup Game</h3>
+    <div class="game-box">
+      <div class="score">Score: <span id="score">0</span></div>
+    </div>
+    <button onclick="startGame()">Play</button>
+  </div>
+
+  <div class="card">
+    <h3>📸 AI Clean Scan</h3>
+    <video id="camera" autoplay></video>
+    <button onclick="startCamera()">Scan Area</button>
+    <p>Status: <strong id="aiStatus">Waiting...</strong></p>
+  </div>
+
+  <div class="card">
+    <h3>🔍 Lost & Found</h3>
+    <video id="lfCamera" autoplay></video>
+    <button onclick="startLFCamera()">Open Camera</button>
+    <button onclick="capturePhoto()">Capture Photo</button>
+    <canvas id="lfCanvas" style="display:none"></canvas>
+    <img id="photoPreview" style="display:none">
+    <input id="itemDesc" placeholder="Describe the item">
+    <button onclick="submitLostItem()">Submit</button>
+    <p id="lfStatus"></p>
+  </div>
+
+  <div class="card">
+    <h3>🏆 Live Leaderboard</h3>
+    <ul id="leaderboard"></ul>
+  </div>
+
+  <div class="card">
+    <h3>📣 Share Your Review</h3>
+    <textarea rows="3" placeholder="Write your experience..."></textarea>
+    <div class="social-buttons">
+      <button onclick="share('Instagram')">Instagram</button>
+      <button onclick="share('Twitter')">Twitter</button>
+      <button onclick="share('Facebook')">Facebook</button>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<footer>
+  © 2025 CleanFest AI — Clean • Play • Win
+</footer>
+
+<script>
+let user="",score=0,lfStream;
+let leaderboardData=[
+  {name:"Alex",score:1200},
+  {name:"Sam",score:980},
+  {name:"Jordan",score:870}
+];
+
+function login(){
+  user=document.getElementById("username").value.trim();
+  if(!user) return alert("Enter your name");
+
+  leaderboardData.push({name:user,score:0});
+
+  document.getElementById("login").style.display="none";
+  document.getElementById("hero").style.display="flex";
+  document.getElementById("main").style.display="block";
+  updateLeaderboard();
+}
+
+function startGame(){
+  score=0;
+  const interval=setInterval(()=>{
+    score+=Math.floor(Math.random()*10)+1;
+    document.getElementById("score").innerText=score;
+  },600);
+
+  setTimeout(()=>{
+    clearInterval(interval);
+    leaderboardData=leaderboardData.map(p=>p.name===user?{...p,score}:p);
+    updateLeaderboard();
+    alert("Game completed! Score: "+score);
+  },10000);
+}
+
+function updateLeaderboard(){
+  leaderboardData.sort((a,b)=>b.score-a.score);
+  const list=document.getElementById("leaderboard");
+  list.innerHTML="";
+  leaderboardData.forEach((p,i)=>{
+    const li=document.createElement("li");
+    li.innerText=`${i+1}. ${p.name} — ${p.score} pts`;
+    if(p.name===user) li.style.color="#6ef3ff";
+    list.appendChild(li);
+  });
+}
+
+function startCamera(){
+  navigator.mediaDevices.getUserMedia({video:true})
+  .then(s=>{
+    camera.srcObject=s;
+    aiStatus.innerText="Analyzing...";
+    setTimeout(()=>aiStatus.innerText="Clean Verified ✅",3000);
+  });
+}
+
+function startLFCamera(){
+  navigator.mediaDevices.getUserMedia({video:true})
+  .then(s=>{
+    lfStream=s;
+    lfCamera.srcObject=s;
+  });
+}
+
+function capturePhoto(){
+  lfCanvas.width=lfCamera.videoWidth;
+  lfCanvas.height=lfCamera.videoHeight;
+  lfCanvas.getContext("2d").drawImage(lfCamera,0,0);
+  photoPreview.src=lfCanvas.toDataURL();
+  photoPreview.style.display="block";
+  lfStream.getTracks().forEach(t=>t.stop());
+}
+
+function submitLostItem(){
+  lfStatus.innerText=itemDesc.value.trim()
+  ? "Item submitted successfully ✅"
+  : "Add description first";
+}
+
+function share(p){
+  alert("Shared on "+p+" (demo)");
+}
+</script>
+
+</body>
+</html>
+
+
