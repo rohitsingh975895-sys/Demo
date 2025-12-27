@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoSync</title>
+
+<style>
+:root {
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#1e293b;
+  --accent:#22c55e;
+  --secondary:#3b82f6;
+}
+body.dark{
+  --bg:#020617;
+  --card:#0f172a;
+  --text:#f8fafc;
+}
+*{box-sizing:border-box;font-family:system-ui,sans-serif}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+}
+header{
+  position:sticky;
+  top:0;
+  background:var(--card);
+  padding:1rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 4px 15px rgba(0,0,0,.1);
+  z-index:10;
+}
+header h1{
+  font-size:clamp(2rem,6vw,2.6rem);
+  font-weight:800;
+}
+.toggle{
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  padding:.5rem 1rem;
+  border-radius:20px;
+}
+section{
+  padding:2rem 1rem;
+  max-width:720px;
+  margin:auto;
+}
+.card{
+  background:var(--card);
+  border-radius:18px;
+  padding:1.5rem;
+  margin-bottom:2rem;
+  box-shadow:0 15px 30px rgba(0,0,0,.08);
+}
+h2{margin-top:0}
+button{
+  width:100%;
+  padding:.9rem;
+  border-radius:14px;
+  border:none;
+  background:var(--accent);
+  color:white;
+  font-size:1rem;
+  margin-top:.7rem;
+}
+button.secondary{background:var(--secondary)}
+input,textarea{
+  width:100%;
+  padding:.8rem;
+  border-radius:12px;
+  border:1px solid #cbd5e1;
+  margin-top:.6rem;
+}
+video,img{
+  width:100%;
+  border-radius:14px;
+  margin-top:1rem;
+}
+.leaderboard li{
+  display:flex;
+  justify-content:space-between;
+  padding:.5rem 0;
+}
+.footer{
+  text-align:center;
+  opacity:.7;
+  padding-bottom:2rem;
+  font-size:.85rem;
+}
+
+/* EMAIL GATE */
+#emailGate{
+  position:fixed;
+  inset:0;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:50;
+}
+.email-box{
+  background:white;
+  padding:2rem;
+  border-radius:20px;
+  width:90%;
+  max-width:400px;
+  text-align:center;
+}
+
+/* ADMIN */
+#adminLogin,#adminPanel{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:100;
+}
+#adminLogin{
+  background:#000000aa;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+#adminPanel{
+  background:var(--bg);
+  overflow-y:auto;
+}
+</style>
+</head>
+
+<body>
+
+<!-- EMAIL VERIFICATION -->
+<div id="emailGate">
+  <div class="email-box">
+    <h2>🌱 Welcome to EcoSync</h2>
+    <p>Enter your email to join the event</p>
+    <input type="email" id="emailInput" placeholder="you@example.com">
+    <button onclick="verifyEmail()">Continue</button>
+  </div>
+</div>
+
+<header>
+  <h1>EcoSync</h1>
+  <button class="toggle" onclick="toggleTheme()">🌙</button>
+</header>
+
+<section>
+
+<div class="card">
+  <h2>🎤 Clean • Scan • Earn</h2>
+  <p>Use AI to keep event venues clean and earn rewards.</p>
+</div>
+
+<div class="card">
+  <h2>📸 Scan & Clean</h2>
+  <button onclick="startCamera()">Open Back Camera</button>
+  <video id="camera" autoplay playsinline></video>
+  <button onclick="verifyClean()">Verify Clean Area</button>
+  <p id="aiResult"></p>
+</div>
+
+<div class="card">
+  <h2>🏆 Live Leaderboard</h2>
+  <ul class="leaderboard" id="leaderboard"></ul>
+</div>
+
+<div class="card">
+  <h2>📦 Lost & Found</h2>
+  <p><strong>Found an item?</strong></p>
+  <input type="file" accept="image/*" onchange="uploadFoundItem(event)">
+  <img id="foundPreview">
+
+  <p><strong>Lost something?</strong></p>
+  <textarea id="lostDesc" placeholder="Describe your lost item..."></textarea>
+  <button class="secondary" onclick="matchItem()">Find Match</button>
+  <p id="matchResult"></p>
+</div>
+
+<div class="card">
+  <h2>📲 Share Impact</h2>
+  <button onclick="share()">Share Achievement</button>
+</div>
+
+</section>
+
+<div class="footer">
+  EcoSync © Smart Sustainable Events<br>
+  <button onclick="openAdmin()" style="background:none;border:none;font-size:.8rem;">Admin</button>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLogin">
+  <div class="card" style="max-width:350px;">
+    <h2>🔐 Admin Login</h2>
+    <input type="password" id="adminPin" placeholder="Admin PIN">
+    <button onclick="verifyAdmin()">Login</button>
+    <button class="secondary" onclick="closeAdmin()">Cancel</button>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="adminPanel">
+  <header>
+    <h1>EcoSync Admin</h1>
+    <button class="toggle" onclick="closeAdmin()">✖</button>
+  </header>
+  <section>
+    <div class="card">
+      <h2>📊 Event Stats</h2>
+      <p>Total Users: <strong id="adminUsers">0</strong></p>
+      <p>Clean Actions: <strong id="adminActions">0</strong></p>
+      <p>Total Points: <strong id="adminPoints">0</strong></p>
+    </div>
+    <div class="card">
+      <h2>🏆 Controls</h2>
+      <button onclick="resetLeaderboard()">Reset Leaderboard</button>
+      <button class="secondary" onclick="clearLostFound()">Clear Lost & Found</button>
+    </div>
+  </section>
+</div>
+
+<script>
+/* EMAIL */
+function verifyEmail(){
+  let email=document.getElementById("emailInput").value;
+  if(!email.includes("@")){alert("Enter valid email");return;}
+  localStorage.setItem("ecosync_email",email);
+  document.getElementById("emailGate").style.display="none";
+}
+if(localStorage.getItem("ecosync_email")){
+  document.getElementById("emailGate").style.display="none";
+}
+
+/* THEME */
+function toggleTheme(){document.body.classList.toggle("dark");}
+
+/* CAMERA */
+function startCamera(){
+  navigator.mediaDevices.getUserMedia({
+    video:{facingMode:{exact:"environment"}}
+  }).then(s=>camera.srcObject=s)
+  .catch(()=>alert("Camera access denied"));
+}
+
+/* LEADERBOARD */
+let points=0,cleanActions=0;
+let leaderboard=[
+  {name:"Alex",score:120},
+  {name:"Sam",score:90},
+  {name:"You",score:0}
+];
+function updateLeaderboard(){
+  let ul=document.getElementById("leaderboard");
+  ul.innerHTML="";
+  leaderboard.sort((a,b)=>b.score-a.score)
+    .forEach(p=>{
+      let li=document.createElement("li");
+      li.innerHTML=`<span>${p.name}</span><strong>${p.score}</strong>`;
+      ul.appendChild(li);
+    });
+}
+updateLeaderboard();
+
+/* AI CLEAN VERIFY */
+function verifyClean(){
+  let confidence=Math.floor(Math.random()*40)+60;
+  if(confidence>70){
+    points+=10; cleanActions++;
+    leaderboard[2].score=points;
+    document.getElementById("aiResult").innerText=
+      `✅ Verified (${confidence}% AI confidence)`;
+    updateLeaderboard();
+    updateAdminStats();
+  } else {
+    document.getElementById("aiResult").innerText="❌ Try again";
+  }
+}
+
+/* LOST & FOUND */
+function uploadFoundItem(e){
+  foundPreview.src=URL.createObjectURL(e.target.files[0]);
+}
+function matchItem(){
+  let d=lostDesc.value.toLowerCase();
+  matchResult.innerText=
+    d.includes("phone")||d.includes("wallet")
+    ?"🔍 AI Match Found!"
+    :"❌ No match yet";
+}
+
+/* SHARE */
+function share(){alert("🎉 Shared! (Demo mode)");}
+
+/* ADMIN */
+const ADMIN_PIN="1234";
+function openAdmin(){adminLogin.style.display="flex";}
+function closeAdmin(){
+  adminLogin.style.display="none";
+  adminPanel.style.display="none";
+}
+function verifyAdmin(){
+  if(adminPin.value===ADMIN_PIN){
+    adminLogin.style.display="none";
+    adminPanel.style.display="block";
+    updateAdminStats();
+  } else alert("Wrong PIN");
+}
+function updateAdminStats(){
+  adminUsers.innerText=localStorage.getItem("ecosync_email")?1:0;
+  adminActions.innerText=cleanActions;
+  adminPoints.innerText=points;
+}
+function resetLeaderboard(){
+  points=0;cleanActions=0;
+  leaderboard[2].score=0;
+  updateLeaderboard();updateAdminStats();
+  alert("Leaderboard reset");
+}
+function clearLostFound(){
+  foundPreview.src="";
+  lostDesc.value="";
+  matchResult.innerText="";
+  alert("Lost & Found cleared");
+}
+</script>
+
+</body>
+</html>
